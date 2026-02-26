@@ -1,3 +1,1 @@
-/* ═══════════════════════════════════════════════════════
-   GOLDSTAR TCG TERMINAL v5  ·  app.js
-SEE_WORKSPACE_FILE
+PLACEHOLDER_APP_JS_CONTENT_TO_BE_REPLACED
