@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GoldStar">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#D4AF37">
+<meta name="msapplication-TileColor" content="#0a0a10">
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16x16.png">
+<title>★ GOLDSTAR TCG TERMINAL v5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ─── TOP BAR ─── -->
+  <div id="top-bar">
+    <div class="brand" onclick="switchView('dashboard')">
+      <span class="brand-star">★</span>
+      <span class="brand-name">GOLDSTAR TCG</span>
+      <span class="brand-tagline">LOW-POP GRAILS · COMPS & FLIPS · $0→$2M</span>
+    </div>
+
+    <!-- ─── UNIVERSAL SEARCH ─── -->
+    <div id="global-search-container">
+      <div class="global-search-bar" onclick="openGlobalSearch()">
+        <span class="gs-icon">⌕</span>
+        <input type="text" id="global-search-input" placeholder="Search cards, sealed, sets..." autocomplete="off" spellcheck="false">
+        <span class="gs-kbd">F9</span>
+      </div>
+      <div id="search-dropdown" class="search-dropdown" style="display:none">
+        <!-- Search filter chips -->
+        <div class="search-filter-chips">
+          <button class="search-filter-chip active" data-filter="all">ALL</button>
+          <button class="search-filter-chip" data-filter="pokemon">PKM</button>
+          <button class="search-filter-chip" data-filter="magic">MTG</button>
+          <button class="search-filter-chip" data-filter="onepiece">OP</button>
+          <button class="search-filter-chip" data-filter="sealed">SEALED</button>
+        </div>
+        <!-- Results rendered by JS -->
+      </div>
+    </div>
+
+    <div id="ticker-wrap">
+      <div id="ticker-track"></div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="pro-badge" onclick="showSubscriptionModal()">★ PRO</button>
+      <div class="time-display">--:--:-- EST</div>
+      <div class="market-status">● LIVE</div>
+    </div>
+  </div>
+
+  <!-- ─── NAV BAR ─── -->
+  <div id="nav-bar">
+    <button class="nav-btn active" data-view="dashboard" onclick="switchView('dashboard')"><span class="fkey">F1</span>DASHBOARD</button>
+    <button class="nav-btn" data-view="charts"    onclick="switchView('charts')">   <span class="fkey">F2</span>CHARTS</button>
+    <button class="nav-btn" data-view="portfolio" onclick="switchView('portfolio')"><span class="fkey">F3</span>PORTFOLIO</button>
+    <button class="nav-btn" data-view="sealed"    onclick="switchView('sealed')">   <span class="fkey">F4</span>SEALED</button>
+    <button class="nav-btn" data-view="arb"       onclick="switchView('arb')">      <span class="fkey">F5</span>ARB SCANNER</button>
+    <button class="nav-btn" data-view="grade"     onclick="switchView('grade')">    <span class="fkey">F6</span>GRADING CALC</button>
+    <button class="nav-btn" data-view="watchlist" onclick="switchView('watchlist')"><span class="fkey">F7</span>WATCHLIST</button>
+    <button class="nav-btn" onclick="showHelp()" style="margin-left:auto"><span class="fkey">F8</span>GUIDE</button>
+    <button class="nav-btn" onclick="openCommandBar()" style="color:var(--gold-dim)">/ CMD</button>
+    <a class="nav-btn" href="https://www.ebay.com/usr/goldstaartcg" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;text-decoration:none;color:var(--text-dim)">★ EBAY</a>
+    <a class="nav-btn" href="https://app.getcollectr.com/showcase/profile/e59fe50f-3a80-4602-928b-6576c90b71fb" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;text-decoration:none;color:var(--text-dim)">COLLECTR</a>
+  </div>
+
+  <!-- ─── INDICES BAR ─── -->
+  <div id="indices-bar">
+    <div class="index-item" id="idx-poke" onclick="switchView('charts')">
+      <div class="idx-label">POKEMON INDEX</div>
+      <div class="idx-val">4,287.52</div>
+      <div class="idx-chg pos">+3.12% ▲ $41.20</div>
+      <div class="idx-bar"></div>
+    </div>
+    <div class="index-item" id="idx-magic" onclick="switchView('charts')">
+      <div class="idx-label">MAGIC INDEX</div>
+      <div class="idx-val">8,143.80</div>
+      <div class="idx-chg pos">+0.51% ▲ $41.20</div>
+      <div class="idx-bar"></div>
+    </div>
+    <div class="index-item" id="idx-op" onclick="switchView('charts')">
+      <div class="idx-label">ONE PIECE IDX</div>
+      <div class="idx-val">1,892.34</div>
+      <div class="idx-chg pos">+4.86% ▲ $87.60</div>
+      <div class="idx-bar"></div>
+    </div>
+    <div class="index-item" id="idx-gs" onclick="switchView('portfolio')">
+      <div class="idx-label">GOLDSTAR PORT</div>
+      <div class="idx-val">$12,450</div>
+      <div class="idx-chg pos">+2.81% ▲ $340.00</div>
+      <div class="idx-bar" style="background:var(--gold)"></div>
+    </div>
+  </div>
+
+  <!-- ─── MAIN CONTENT ─── -->
+  <div id="main-content">
+
+    <!-- F1: DASHBOARD -->
+    <div id="view-dashboard" class="view active">
+      <div class="panel" style="grid-column:1">
+        <div class="panel-header">
+          <span class="panel-title">▲ TOP GAINERS</span>
+          <span class="panel-meta">7D PERFORMANCE</span>
+        </div>
+        <div class="panel-body" id="movers-gain"></div>
+      </div>
+
+      <div class="panel" style="grid-column:2">
+        <div class="panel-header">
+          <span class="panel-title">◈ MARKET INTEL</span>
+          <span class="panel-meta">GOLDSTAR + EXTERNAL</span>
+        </div>
+        <div class="panel-body" id="news-feed"></div>
+      </div>
+
+      <div class="panel" style="grid-column:3">
+        <div class="panel-header">
+          <span class="panel-title">★ MARKET SENTIMENT</span>
+          <span class="panel-meta">BULL/BEAR GAUGE</span>
+        </div>
+        <div class="panel-body">
+          <div class="sentiment-container">
+            <div class="gauge-wrap">
+              <canvas id="sentiment-gauge"></canvas>
+            </div>
+            <div class="gauge-label" id="sentiment-label">BULLISH</div>
+            <div class="gauge-sub" id="sentiment-sub">LOADING...</div>
+            <div class="sentiment-stats">
+              <div class="sent-stat" id="sent-stat-0">
+                <div class="sent-stat-val pos">—</div>
+                <div class="sent-stat-lbl">BULLISH</div>
+              </div>
+              <div class="sent-stat" id="sent-stat-1">
+                <div class="sent-stat-val neu">—</div>
+                <div class="sent-stat-lbl">NEUTRAL</div>
+              </div>
+              <div class="sent-stat" id="sent-stat-2">
+                <div class="sent-stat-val neg">—</div>
+                <div class="sent-stat-lbl">BEARISH</div>
+              </div>
+            </div>
+          </div>
+          <div class="panel-header" style="margin-top:auto;border-top:1px solid var(--border);border-bottom:none">
+            <span class="panel-title">⚡ DEAL FINDER</span>
+            <span class="panel-meta">BELOW MA30</span>
+          </div>
+          <div id="deal-finder"></div>
+        </div>
+      </div>
+
+      <div class="panel" style="grid-column:1">
+        <div class="panel-header">
+          <span class="panel-title">▼ TOP LOSERS</span>
+          <span class="panel-meta">7D PERFORMANCE</span>
+        </div>
+        <div class="panel-body" id="movers-loss"></div>
+      </div>
+
+      <div class="panel" style="grid-column:2;grid-row:2">
+        <div class="panel-header">
+          <span class="panel-title">★ GOLDSTAR P&L</span>
+          <span class="panel-meta">PORTFOLIO OVERVIEW</span>
+        </div>
+        <div class="panel-body">
+          <div id="dashboard-pnl" class="pnl-widget">
+            <div class="pnl-cell">
+              <div class="pnl-label">PORTFOLIO VALUE</div>
+              <div class="pnl-value">Loading...</div>
+            </div>
+            <div class="pnl-cell">
+              <div class="pnl-label">UNREALIZED P&L</div>
+              <div class="pnl-value">—</div>
+            </div>
+            <div class="pnl-cell">
+              <div class="pnl-label">REALIZED GAINS</div>
+              <div class="pnl-value">—</div>
+            </div>
+            <div class="pnl-cell">
+              <div class="pnl-label">SESSION P&L</div>
+              <div class="pnl-value">—</div>
+            </div>
+          </div>
+          <div class="panel-header" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-top:0">
+            <span class="panel-title">◎ FEATURED CARD</span>
+            <span class="panel-meta" id="featured-card-meta">MOONBREON · PKM</span>
+          </div>
+          <div style="padding:8px;flex:1;display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font-size:18px;font-weight:800;color:var(--gold)">MOONBREON</span>
+              <span style="font-size:22px;font-weight:800;color:var(--text-bright)" id="featured-price">$485.00</span>
+            </div>
+            <div style="font-size:10px;color:var(--text-dim)">Umbreon VMAX Alt Art · Evolving Skies · No reprint · <span class="lang-badge en">EN</span></div>
+            <div style="font-size:11px;color:var(--green);font-weight:700">+3.10% 7D · +12.50% 30D · Grail Status</div>
+            <div style="font-size:10px;color:var(--text-secondary);line-height:1.6">
+              PSA 10 comps: <span style="color:var(--gold);font-weight:700">$1,800+</span> ·
+              Raw buy zone: <span style="color:var(--gold);font-weight:700">$460-480</span> ·
+              Hold rating: <span style="color:var(--green);font-weight:700">★★★★★</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+              <button class="btn-primary" style="font-size:10px;padding:4px 10px" onclick="openCardModal('MOONBREON')">VIEW ANALYSIS</button>
+              <a href="https://www.tcgplayer.com/search/all/product?q=Umbreon+VMAX+Alt+Art+English" target="_blank" rel="noopener noreferrer" class="mkt-link-chip tcgp" style="font-size:9px">BUY TCG</a>
+              <a href="https://www.ebay.com/sch/i.html?_nkw=Umbreon+VMAX+Alt+Art+English&LH_BIN=1&_sop=15" target="_blank" rel="noopener noreferrer" class="mkt-link-chip ebay" style="font-size:9px">BUY EBAY</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="grid-column:3;grid-row:2">
+        <div class="panel-header">
+          <span class="panel-title">◑ QUICK CHART</span>
+          <span class="panel-meta">CLICK TO EXPAND</span>
+        </div>
+        <div class="panel-body" style="display:flex;flex-direction:column">
+          <div style="padding:6px 12px;display:flex;gap:6px;flex-wrap:wrap;border-bottom:1px solid var(--border)">
+            <button class="action-btn" onclick="selectQuickChart('CHARZ-EX')">CHARZ-EX</button>
+            <button class="action-btn" onclick="selectQuickChart('MOONBREON')">MOONBREON</button>
+            <button class="action-btn" onclick="selectQuickChart('SABO-OP13')">SABO-OP13</button>
+            <button class="action-btn" onclick="selectQuickChart('BLKLOTUS')">BLKLOTUS</button>
+            <button class="action-btn" onclick="selectQuickChart('PERONA-14')">PERONA-14</button>
+            <button class="action-btn" onclick="switchView('charts')" style="color:var(--gold);border-color:var(--gold-dim)">ALL CHARTS →</button>
+          </div>
+          <div style="flex:1;padding:8px;position:relative;min-height:0">
+            <canvas id="dashboard-chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- F2: CHARTS -->
+    <div id="view-charts" class="view">
+      <div class="chart-sidebar">
+        <div class="chart-sidebar-header">CARD UNIVERSE (48)</div>
+        <div class="chart-search">
+          <input type="text" id="chart-search-input" placeholder="Search cards..." autocomplete="off">
+        </div>
+        <div class="chart-list" id="chart-list-items"></div>
+      </div>
+      <div class="chart-main">
+        <div class="chart-card-header" id="chart-card-header">
+          <div class="cch-left">
+            <div class="cch-sym">—</div>
+            <div class="cch-name">Select a card</div>
+          </div>
+          <div class="cch-right">
+            <div class="cch-price">—</div>
+          </div>
+        </div>
+        <div class="chart-toggles">
+          <span style="font-size:9px;color:var(--gold-dim);font-weight:700;margin-right:4px">RANGE:</span>
+          <button class="chart-toggle-btn" data-range="14">14D</button>
+          <button class="chart-toggle-btn active" data-range="60">60D</button>
+          <button class="chart-toggle-btn" data-range="90">90D</button>
+          <button class="chart-toggle-btn" data-range="180">180D</button>
+          <span style="font-size:9px;color:var(--gold-dim);font-weight:700;margin-left:12px;margin-right:4px">MA:</span>
+          <button class="chart-toggle-btn active" data-range="60">MA7</button>
+          <button class="chart-toggle-btn active" data-range="60">MA30</button>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="main-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- F3: PORTFOLIO -->
+    <div id="view-portfolio" class="view">
+      <div class="portfolio-top">
+        <div class="port-stat">
+          <div class="port-stat-lbl">TOTAL VALUE</div>
+          <div id="ps-value" class="port-stat-val">Loading...</div>
+        </div>
+        <div class="port-stat">
+          <div class="port-stat-lbl">COST BASIS</div>
+          <div id="ps-cost" class="port-stat-val">—</div>
+        </div>
+        <div class="port-stat">
+          <div class="port-stat-lbl">UNREALIZED P&L</div>
+          <div id="ps-gain" class="port-stat-val">—</div>
+        </div>
+        <div class="port-stat">
+          <div class="port-stat-lbl">REALIZED GAINS</div>
+          <div id="ps-realized" class="port-stat-val">—</div>
+        </div>
+        <div class="port-stat">
+          <div class="port-stat-lbl">OPEN POSITIONS</div>
+          <div id="ps-count" class="port-stat-val">—</div>
+        </div>
+      </div>
+
+      <!-- Portfolio toolbar -->
+      <div class="portfolio-toolbar">
+        <button class="btn-primary" onclick="openAddPositionModal()">+ ADD POSITION</button>
+        <button class="btn-secondary" onclick="openImportModal()">⬆ CSV IMPORT</button>
+        <button class="btn-secondary" onclick="exportPortfolioCSV()">⬇ CSV EXPORT</button>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px">
+          <label style="font-size:10px;color:var(--text-dim);display:flex;align-items:center;gap:4px;cursor:pointer">
+            <input type="checkbox" id="select-all-checkbox" onchange="toggleSelectAll(this.checked)" style="cursor:pointer">
+            SELECT ALL
+          </label>
+        </div>
+      </div>
+
+      <!-- Bulk actions bar (hidden until rows selected) -->
+      <div id="bulk-actions-bar" class="bulk-actions-bar" style="display:none">
+        <span class="bulk-count">0 selected</span>
+        <button class="bulk-action-btn sell" onclick="bulkSell()">MARK SOLD</button>
+        <button class="bulk-action-btn del" onclick="bulkDelete()">DELETE</button>
+        <button class="bulk-action-btn" onclick="clearBulkSelection()">CLEAR</button>
+      </div>
+
+      <div class="portfolio-body">
+        <table class="portfolio-table">
+          <thead>
+            <tr>
+              <th style="width:28px"></th>
+              <th>GAME</th>
+              <th>CARD NAME</th>
+              <th>SET</th>
+              <th>QTY</th>
+              <th>BUY</th>
+              <th>CURRENT</th>
+              <th>P&L $</th>
+              <th>P&L %</th>
+              <th>CONDITION</th>
+              <th>PLATFORM</th>
+              <th>NOTES</th>
+              <th>MARKET</th>
+              <th>STATUS</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="portfolio-tbody">
+            <tr><td colspan="15" style="text-align:center;padding:30px;color:var(--text-dim)">Loading portfolio...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="padding:6px 12px;font-size:9px;color:var(--text-dim);border-top:1px solid var(--border)">
+        TIP: Double-click any cell (Qty, Buy, Current, Condition, Notes) to edit inline · Select rows for bulk actions
+      </div>
+    </div>
+
+    <!-- F4: SEALED PRODUCTS -->
+    <div id="view-sealed" class="view">
+      <div class="panel-header" style="flex-shrink:0">
+        <span class="panel-title">◈ SEALED PRODUCT TRACKER</span>
+        <span class="panel-meta">15 PRODUCTS · HOLD RATINGS · BREAK-EVEN EV · LANGUAGE-AWARE LINKS</span>
+      </div>
+      <div class="sealed-grid" id="sealed-grid"></div>
+    </div>
+
+    <!-- F5: ARBITRAGE SCANNER -->
+    <div id="view-arb" class="view">
+      <div class="arb-filters">
+        <span style="font-size:10px;font-weight:700;color:var(--gold-dim);letter-spacing:1px">FILTER:</span>
+        <button class="arb-filter-btn active" data-filter="all" onclick="">ALL</button>
+        <button class="arb-filter-btn" data-filter="flip">QUICK FLIPS</button>
+        <button class="arb-filter-btn" data-filter="grail">GRAIL PLAYS</button>
+        <button class="arb-filter-btn" data-filter="sealed">SEALED ARB</button>
+        <div class="arb-stats-bar">
+          <span class="arb-stat" id="arb-stat-buys">— BUY SIGNALS</span>
+          <span class="arb-stat" id="arb-stat-spread">Max SPREAD: —</span>
+          <span class="arb-stat" style="color:var(--text-dim);font-size:9px">eBay ~13% fee · TCGPlayer ~12% fee · Language-aware search links</span>
+        </div>
+      </div>
+      <div class="arb-table-wrap">
+        <table class="arb-table">
+          <thead>
+            <tr>
+              <th>CARD</th>
+              <th>TCGPLAYER</th>
+              <th>EBAY AVG</th>
+              <th>SPREAD $</th>
+              <th>SPREAD %</th>
+              <th>SIGNAL</th>
+              <th title="Flip Score 1-10">FLIP SCORE</th>
+              <th>EST. PROFIT</th>
+              <th>VOLUME</th>
+            </tr>
+          </thead>
+          <tbody id="arb-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- F6: GRADING CALCULATOR -->
+    <div id="view-grade" class="view">
+      <div class="grade-form-panel">
+        <div class="panel-header">
+          <span class="panel-title">⬡ GRADING CALCULATOR</span>
+          <span class="panel-meta">PSA / CGC / BGS ROI</span>
+        </div>
+        <div class="grade-form-body">
+          <div class="form-group">
+            <label class="form-label">CARD NAME</label>
+            <input class="form-input" id="grade-card-name" placeholder="e.g. Charizard ex SIR" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label class="form-label">RAW PRICE ($)</label>
+            <input class="form-input" id="grade-raw-price" type="number" step="0.01" placeholder="e.g. 220.00">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group">
+              <label class="form-label">GRADING SERVICE</label>
+              <select class="form-select" id="grade-service">
+                <option value="PSA">PSA</option>
+                <option value="CGC">CGC</option>
+                <option value="BGS">BGS</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">ESTIMATED GRADE</label>
+              <select class="form-select" id="grade-est-grade">
+                <option>PSA 10</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">GRADING TIER</label>
+            <select class="form-select" id="grade-tier">
+              <option value="regular">Economy / Regular</option>
+              <option value="express">Express</option>
+              <option value="walkthrough">Walkthrough / Ultra Fast</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">COST OVERRIDE ($) <span style="color:var(--text-dim);font-weight:400">(optional)</span></label>
+            <input class="form-input" id="grade-cost" type="number" step="0.01" placeholder="Auto-calculated">
+          </div>
+          <button class="btn-calc" onclick="calcGrade()">CALCULATE ROI</button>
+
+          <div style="border-top:1px solid var(--border);padding-top:12px">
+            <div class="form-label" style="margin-bottom:8px">QUICK PRESETS</div>
+            <div class="grade-presets">
+              <button class="preset-btn" onclick="loadGradePreset(0)">
+                <span class="preset-name">Charizard ex SIR 199/165</span>
+                <span class="preset-price">Raw $220</span>
+              </button>
+              <button class="preset-btn" onclick="loadGradePreset(1)">
+                <span class="preset-name">Moonbreon (Umbreon VMAX AA)</span>
+                <span class="preset-price">Raw $485</span>
+              </button>
+              <button class="preset-btn" onclick="loadGradePreset(2)">
+                <span class="preset-name">Sabo OP13-120 Super AA</span>
+                <span class="preset-price">Raw $3,500 · JP</span>
+              </button>
+              <button class="preset-btn" onclick="loadGradePreset(3)">
+                <span class="preset-name">Pikachu VMAX Rainbow</span>
+                <span class="preset-price">Raw $310</span>
+              </button>
+              <button class="preset-btn" onclick="loadGradePreset(4)">
+                <span class="preset-name">Luffy OP01 Alt Art</span>
+                <span class="preset-price">Raw $420</span>
+              </button>
+              <button class="preset-btn" onclick="loadGradePreset(5)">
+                <span class="preset-name">Gaea's Cradle (Urza's Saga)</span>
+                <span class="preset-price">Raw $750</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grade-results-panel">
+        <div class="panel-header">
+          <span class="panel-title">◎ GRADE ROI ANALYSIS</span>
+          <span class="panel-meta">SHOULD I GRADE?</span>
+        </div>
+        <div class="grade-results-body" id="grade-results-content">
+          <div class="empty-state">
+            <div class="empty-icon">⬡</div>
+            <div class="empty-msg">ENTER CARD DETAILS + CALCULATE</div>
+            <div style="font-size:10px;color:var(--text-dim);margin-top:6px;text-align:center;line-height:1.6">
+              Or select a quick preset on the left to analyze<br>popular GoldStar grail candidates
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- F7: WATCHLIST -->
+    <div id="view-watchlist" class="view">
+      <div class="watchlist-toolbar">
+        <span style="font-size:10px;font-weight:700;color:var(--gold-dim);letter-spacing:1px">ADD TO WATCHLIST:</span>
+        <input class="watchlist-input" id="watch-ticker" placeholder="Ticker (e.g. MOONBREON)" autocomplete="off"
+          onkeydown="if(event.key==='Enter')addWatchlistItem()">
+        <input class="watchlist-input" id="watch-target" type="number" step="0.01" placeholder="Alert target $" style="width:130px"
+          onkeydown="if(event.key==='Enter')addWatchlistItem()">
+        <button class="btn-primary" onclick="addWatchlistItem()">★ WATCH</button>
+        <div style="margin-left:auto;font-size:9px;color:var(--text-dim)">
+          TICKERS: CHARZ-EX · MOONBREON · SABO-OP13 · BLKLOTUS · PIKAVMAX · GAESCRD · + more
+        </div>
+      </div>
+      <div class="watchlist-table-wrap">
+        <table class="watchlist-table">
+          <thead>
+            <tr>
+              <th>TICKER</th>
+              <th>CARD NAME</th>
+              <th>PRICE</th>
+              <th>7D CHG</th>
+              <th>30D CHG</th>
+              <th>VOL</th>
+              <th>14D SPARK</th>
+              <th>MARKET</th>
+              <th>ALERT TARGET</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="watchlist-tbody">
+            <tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text-dim)">
+              Watchlist empty. Add tickers above or right-click any card.
+            </td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+
+  <!-- ─── STATUS BAR ─── -->
+  <div id="status-bar">
+    <div class="sb-item gold">
+      <span>★</span>
+      <strong>GOLDSTAR TCG LLC</strong>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-item">
+      <span>EBAY:</span>
+      <a href="https://www.ebay.com/usr/goldstaartcg" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">goldstaartcg</a>
+    </div>
+    <div class="sb-item">
+      <span>IG:</span>
+      <a href="https://www.instagram.com/goldstartcg.llc" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">@goldstartcg.llc</a>
+    </div>
+    <div class="sb-item">
+      <span>COLLECTR:</span>
+      <a href="https://app.getcollectr.com/showcase/profile/e59fe50f-3a80-4602-928b-6576c90b71fb" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">showcase</a>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-item">CARDS: <strong>48</strong></div>
+    <div class="sb-item">SEALED: <strong>15</strong></div>
+    <div class="sb-item">ARB OPP: <strong>18</strong></div>
+    <div class="sb-right">
+      <div class="sb-item gold">PORTFOLIO: <strong id="sb-portfolio">$0</strong></div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">SESSION P&L: <strong id="sb-session">$0</strong></div>
+      <div class="sb-divider"></div>
+      <div class="sb-item">v5.0 · <strong style="color:var(--gold)">/</strong> commands · <strong style="color:var(--gold)">F1-F8</strong> navigate</div>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- ─── COMMAND BAR ─── -->
+<div id="cmd-bar">
+  <div class="cmd-bar-header">★ GOLDSTAR COMMAND INTERFACE · TYPE A COMMAND OR SEARCH</div>
+  <input id="cmd-input" placeholder="/DASH  /CHART  /PORT  /ARB  /GRADE  /WATCH  /GUIDE  /PRO  /EXPORT  /IMPORT  /ADD  /SEARCH" autocomplete="off" spellcheck="false">
+  <div class="cmd-suggestions" id="cmd-suggestions"></div>
+</div>
+
+<!-- ─── ADD POSITION MODAL ─── -->
+<div id="add-position-modal">
+  <div class="add-position-modal-inner">
+    <div class="apm-header">
+      <div class="apm-title">+ ADD POSITION</div>
+      <div class="apm-subtitle">Add a card or sealed product to your portfolio</div>
+      <button class="apm-close" onclick="closeAddPositionModal()">✕</button>
+    </div>
+
+    <div class="apm-body">
+      <!-- Left column -->
+      <div class="apm-col">
+        <div class="form-group">
+          <label class="form-label">GAME</label>
+          <div class="ap-game-selector">
+            <button class="ap-game-btn active" data-game="pokemon">PKM</button>
+            <button class="ap-game-btn" data-game="magic">MTG</button>
+            <button class="ap-game-btn" data-game="onepiece">OP</button>
+          </div>
+        </div>
+
+        <div class="form-group" style="position:relative">
+          <label class="form-label">CARD NAME <span style="color:var(--text-dim);font-weight:400">(type to search)</span></label>
+          <input class="form-input" id="ap-name" placeholder="e.g. Charizard ex SIR 199/165" autocomplete="off" spellcheck="false">
+          <div id="ap-autocomplete" class="ap-autocomplete-dropdown" style="display:none"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">SET</label>
+          <input class="form-input" id="ap-set" placeholder="e.g. 151" autocomplete="off">
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label class="form-label">QUANTITY</label>
+            <input class="form-input" id="ap-qty" type="number" value="1" min="1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">ACQUIRED DATE</label>
+            <input class="form-input" id="ap-date" type="date">
+          </div>
+        </div>
+      </div>
+
+      <!-- Right column -->
+      <div class="apm-col">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label class="form-label">BUY PRICE ($)</label>
+            <input class="form-input" id="ap-buy" type="number" step="0.01" placeholder="0.00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">CURRENT PRICE ($)</label>
+            <input class="form-input" id="ap-curr" type="number" step="0.01" placeholder="Auto-filled">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group">
+            <label class="form-label">CONDITION</label>
+            <select class="form-select" id="ap-cond">
+              <option value="Raw">Raw</option>
+              <option value="PSA 10">PSA 10</option>
+              <option value="PSA 9">PSA 9</option>
+              <option value="PSA 8">PSA 8</option>
+              <option value="CGC 10">CGC 10</option>
+              <option value="CGC 9.5">CGC 9.5</option>
+              <option value="CGC 9">CGC 9</option>
+              <option value="BGS 10">BGS 10</option>
+              <option value="BGS 9.5">BGS 9.5</option>
+              <option value="BGS 9">BGS 9</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">PLATFORM</label>
+            <select class="form-select" id="ap-plat">
+              <option value="eBay">eBay</option>
+              <option value="TCGPlayer">TCGPlayer</option>
+              <option value="Local">Local</option>
+              <option value="Show">Show</option>
+              <option value="Shopify">Shopify</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">NOTES</label>
+          <input class="form-input" id="ap-notes" placeholder="Optional notes..." autocomplete="off">
+        </div>
+
+        <div class="apm-actions">
+          <button class="btn-primary" style="flex:1" onclick="submitAddPosition()">+ ADD TO PORTFOLIO</button>
+          <button class="btn-secondary" onclick="closeAddPositionModal()">CANCEL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CSV IMPORT MODAL ─── -->
+<div id="import-modal">
+  <div class="import-modal-inner">
+    <div class="import-modal-header">
+      <div class="import-modal-title">⬆ CSV IMPORT</div>
+      <div class="import-modal-subtitle">Bulk import portfolio positions from CSV</div>
+      <button class="import-close" onclick="closeImportModal()">✕</button>
+    </div>
+
+    <div class="import-format-hint">
+      <div class="import-hint-title">EXPECTED CSV FORMAT (header row required):</div>
+      <code class="import-hint-code">game,card_name,set_name,quantity,purchase_price,current_price,condition_grade,platform,notes,lang</code>
+      <div style="font-size:9px;color:var(--text-dim);margin-top:4px">All columns optional except card_name. Supported games: pokemon, magic, onepiece. Lang: EN or JP.</div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">UPLOAD FILE</label>
+      <input type="file" id="import-file-input" accept=".csv,.txt" onchange="handleImportFile(event)" class="form-input" style="cursor:pointer">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">OR PASTE CSV DATA</label>
+      <textarea id="import-csv-text" class="import-textarea" placeholder="game,card_name,set_name,quantity,purchase_price,current_price&#10;pokemon,Charizard ex SIR 199/165,151,1,200,220&#10;magic,Force of Will (Alliances),Alliances,2,80,89" rows="8"></textarea>
+    </div>
+
+    <div id="import-preview-section" style="display:none"></div>
+
+    <div class="import-actions">
+      <button class="btn-primary" onclick="previewImportCSV()">PREVIEW IMPORT</button>
+      <button class="btn-primary" id="import-confirm-btn" style="display:none;background:linear-gradient(135deg,#D4AF37,#C5A028);color:#000" onclick="confirmImport()">CONFIRM IMPORT</button>
+      <button class="btn-secondary" onclick="closeImportModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── USER GUIDE / HELP OVERLAY (F8) ─── -->
+<div id="help-overlay">
+  <div class="help-panel guide-panel">
+    <div class="help-title">
+      ★ GOLDSTAR TCG TERMINAL — USER GUIDE v5
+      <span class="help-close" onclick="hideHelp()">✕</span>
+    </div>
+
+    <!-- Guide Tabs -->
+    <div class="guide-tabs">
+      <button class="guide-tab-btn active" data-tab="overview">OVERVIEW</button>
+      <button class="guide-tab-btn" data-tab="views">VIEWS</button>
+      <button class="guide-tab-btn" data-tab="keyboard">KEYBOARD</button>
+      <button class="guide-tab-btn" data-tab="api">API & LINKS</button>
+      <button class="guide-tab-btn" data-tab="about">ABOUT</button>
+    </div>
+
+    <!-- Overview Tab -->
+    <div id="guide-overview" class="guide-tab-content active">
+      <div class="guide-section">
+        <div class="guide-section-title">WHAT IS GOLDSTAR TCG TERMINAL?</div>
+        <p class="guide-text">A Bloomberg-style terminal built specifically for Trading Card Game investors. Track Pokemon, Magic: The Gathering, and One Piece TCG markets with real-time data, arbitrage scanning, grading ROI calculations, and portfolio management.</p>
+      </div>
+      <div class="guide-section">
+        <div class="guide-section-title">NEW IN v5</div>
+        <div class="guide-steps">
+          <div class="guide-step"><span class="guide-step-num">★</span><strong>Language-Aware Pricing</strong> — EN/JP badges on all cards. Search links include language context (JP cards append "Japanese") for accurate pricing on TCGPlayer and eBay.</div>
+          <div class="guide-step"><span class="guide-step-num">★</span><strong>Universal Search</strong> — Search bar in the top bar. Fuzzy search across all 48 cards + 15 sealed products. Filter by PKM/MTG/OP/SEALED. Click → opens modal. Quick +PORT/★WATCH actions.</div>
+          <div class="guide-step"><span class="guide-step-num">★</span><strong>Enhanced Portfolio</strong> — New "ADD POSITION" modal with card autocomplete. CSV import/export (blob download). Double-click inline editing. Bulk select + delete/sell.</div>
+          <div class="guide-step"><span class="guide-step-num">★</span><strong>Backend Upgrades</strong> — Bulk delete, bulk sell, bulk import API endpoints. sym + lang columns in portfolio DB.</div>
+        </div>
+      </div>
+      <div class="guide-section">
+        <div class="guide-section-title">QUICK START</div>
+        <div class="guide-steps">
+          <div class="guide-step"><span class="guide-step-num">1</span>Browse the <strong>Dashboard (F1)</strong> for market overview, top movers, and sentiment</div>
+          <div class="guide-step"><span class="guide-step-num">2</span>Use the <strong>Search Bar</strong> (top center) to find any card or sealed product instantly</div>
+          <div class="guide-step"><span class="guide-step-num">3</span>Use <strong>Arbitrage Scanner (F5)</strong> to find buy/sell spread opportunities</div>
+          <div class="guide-step"><span class="guide-step-num">4</span>Add cards to your <strong>Portfolio (F3)</strong> — click + ADD POSITION or import CSV</div>
+          <div class="guide-step"><span class="guide-step-num">5</span>Set <strong>Watchlist (F7)</strong> alerts for price targets on cards you want to buy</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Views Tab -->
+    <div id="guide-views" class="guide-tab-content">
+      <div class="guide-section">
+        <div class="guide-feature"><span class="guide-fkey">F1</span><strong>Dashboard</strong> — Market overview with top gainers/losers (EN/JP badges), news feed, sentiment gauge, deal finder, portfolio P&L summary, and quick chart.</div>
+        <div class="guide-feature"><span class="guide-fkey">F2</span><strong>Charts</strong> — Full price charts with 14D/60D/90D/180D ranges, MA7 and MA30 overlays. Language badges in sidebar.</div>
+        <div class="guide-feature"><span class="guide-fkey">F3</span><strong>Portfolio</strong> — Track all positions. + ADD POSITION modal with autocomplete, CSV import, inline editing, bulk operations, language-aware marketplace links.</div>
+        <div class="guide-feature"><span class="guide-fkey">F4</span><strong>Sealed Products</strong> — 15 sealed products with EN/JP badges, language-aware search links, hold ratings, ROI %.</div>
+        <div class="guide-feature"><span class="guide-fkey">F5</span><strong>Arbitrage Scanner</strong> — Language-aware BUY links. JP cards search "Japanese" on TCGPlayer/eBay for accurate pricing.</div>
+        <div class="guide-feature"><span class="guide-fkey">F6</span><strong>Grading Calculator</strong> — PSA/CGC/BGS ROI with fee breakdown and population reports.</div>
+        <div class="guide-feature"><span class="guide-fkey">F7</span><strong>Watchlist</strong> — Monitor cards with price alerts. Language badges in card names.</div>
+        <div class="guide-feature"><span class="guide-fkey">F8</span><strong>User Guide</strong> — This documentation overlay.</div>
+      </div>
+    </div>
+
+    <!-- Keyboard Tab -->
+    <div id="guide-keyboard" class="guide-tab-content">
+      <div class="help-grid">
+        <div>
+          <div class="help-section-title">NAVIGATION</div>
+          <div class="help-row"><span class="help-key">F1</span><span class="help-desc">Dashboard</span></div>
+          <div class="help-row"><span class="help-key">F2</span><span class="help-desc">Charts</span></div>
+          <div class="help-row"><span class="help-key">F3</span><span class="help-desc">Portfolio</span></div>
+          <div class="help-row"><span class="help-key">F4</span><span class="help-desc">Sealed Products</span></div>
+          <div class="help-row"><span class="help-key">F5</span><span class="help-desc">Arbitrage Scanner</span></div>
+          <div class="help-row"><span class="help-key">F6</span><span class="help-desc">Grading Calculator</span></div>
+          <div class="help-row"><span class="help-key">F7</span><span class="help-desc">Watchlist</span></div>
+          <div class="help-row"><span class="help-key">F8</span><span class="help-desc">User Guide</span></div>
+        </div>
+        <div>
+          <div class="help-section-title">COMMANDS</div>
+          <div class="help-row"><span class="help-key">/</span><span class="help-desc">Open command bar</span></div>
+          <div class="help-row"><span class="help-key">ESC</span><span class="help-desc">Close modals/overlays</span></div>
+          <div class="help-row"><span class="help-key">?</span><span class="help-desc">User Guide</span></div>
+          <div class="help-section-title" style="margin-top:12px">v5 COMMANDS</div>
+          <div class="help-row"><code style="font-size:10px;color:var(--gold)">/IMPORT</code><span class="help-desc">CSV Import modal</span></div>
+          <div class="help-row"><code style="font-size:10px;color:var(--gold)">/ADD</code><span class="help-desc">Add Position modal</span></div>
+          <div class="help-row"><code style="font-size:10px;color:var(--gold)">/SEARCH</code><span class="help-desc">Universal search</span></div>
+          <div class="help-row"><code style="font-size:10px;color:var(--gold)">/EXPORT</code><span class="help-desc">CSV Export (blob)</span></div>
+          <div class="help-row"><code style="font-size:10px;color:var(--gold)">/PRO</code><span class="help-desc">GoldStar PRO</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- API & Links Tab -->
+    <div id="guide-api" class="guide-tab-content">
+      <div class="guide-section">
+        <div class="guide-section-title">LANGUAGE-AWARE MARKETPLACE LINKS (v5)</div>
+        <p class="guide-text">All marketplace links now include language context. JP cards append "Japanese" to search queries so TCGPlayer and eBay return accurate Japanese card prices (often 5-10x different from EN versions).</p>
+        <div class="guide-api-row"><span class="guide-api-label">JP Card Search</span><span class="guide-api-desc">e.g. "Sabo OP13-120 Super AA Japanese" → JP-only results on TCGPlayer/eBay</span></div>
+        <div class="guide-api-row"><span class="guide-api-label">EN Card Search</span><span class="guide-api-desc">e.g. "Charizard ex SIR 199/165 English" → EN-only results</span></div>
+      </div>
+      <div class="guide-section">
+        <div class="guide-section-title">MARKETPLACE INTEGRATION</div>
+        <div class="guide-api-row"><span class="guide-api-label">TCGPlayer</span><span class="guide-api-desc">Direct product search with language. Buy Now available.</span></div>
+        <div class="guide-api-row"><span class="guide-api-label">eBay BIN</span><span class="guide-api-desc">Buy It Now listings with language filter, sorted by newest.</span></div>
+        <div class="guide-api-row"><span class="guide-api-label">eBay Comps</span><span class="guide-api-desc">Sold/completed listings with language filter for true market value.</span></div>
+      </div>
+      <div class="guide-section">
+        <div class="guide-section-title">GOLDSTAR ECOSYSTEM</div>
+        <div class="guide-api-row"><span class="guide-api-label"><a href="https://www.ebay.com/usr/goldstaartcg" target="_blank" rel="noopener noreferrer">eBay Store</a></span><span class="guide-api-desc">goldstaartcg · 100% positive · 43 ratings</span></div>
+        <div class="guide-api-row"><span class="guide-api-label"><a href="https://www.instagram.com/goldstartcg.llc/" target="_blank" rel="noopener noreferrer">Instagram</a></span><span class="guide-api-desc">@goldstartcg.llc · Pulls, comps, deals</span></div>
+        <div class="guide-api-row"><span class="guide-api-label"><a href="https://app.getcollectr.com/showcase/profile/e59fe50f-3a80-4602-928b-6576c90b71fb" target="_blank" rel="noopener noreferrer">Collectr</a></span><span class="guide-api-desc">Collection showcase & grail display</span></div>
+      </div>
+    </div>
+
+    <!-- About Tab -->
+    <div id="guide-about" class="guide-tab-content">
+      <div class="guide-section" style="text-align:center;padding:20px">
+        <div style="font-size:28px;color:var(--gold-bright);margin-bottom:8px">★</div>
+        <div style="font-size:16px;font-weight:800;color:var(--gold);letter-spacing:4px;margin-bottom:4px">GOLDSTAR TCG LLC</div>
+        <div style="font-size:11px;color:var(--text-dim);letter-spacing:2px;margin-bottom:16px">LOW-POP GRAILS · COMPS & FLIPS · FROM $0 → $2M</div>
+        <div style="font-size:11px;color:var(--text-secondary);line-height:1.8">
+          GoldStar TCG Terminal is a proprietary market intelligence platform<br>
+          designed for serious TCG investors and flippers.<br><br>
+          Covering <strong style="color:var(--gold)">Pokemon</strong>, <strong style="color:var(--purple)">Magic: The Gathering</strong>, and <strong style="color:var(--red)">One Piece TCG</strong><br><br>
+          <span style="color:var(--gold)">48 cards</span> · <span style="color:var(--gold)">15 sealed products</span> · <span style="color:var(--gold)">18 arbitrage opportunities</span><br>
+          <span style="color:var(--gold)">Language-aware pricing</span> · <span style="color:var(--gold)">Universal search</span> · <span style="color:var(--gold)">CSV import/export</span>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:center;gap:8px;flex-wrap:wrap">
+          <a href="https://www.ebay.com/usr/goldstaartcg" target="_blank" rel="noopener noreferrer" class="mkt-link-chip ebay">eBay Store</a>
+          <a href="https://www.instagram.com/goldstartcg.llc/" target="_blank" rel="noopener noreferrer" class="mkt-link-chip tcgp">Instagram</a>
+          <a href="https://app.getcollectr.com/showcase/profile/e59fe50f-3a80-4602-928b-6576c90b71fb" target="_blank" rel="noopener noreferrer" class="mkt-link-chip comps">Collectr</a>
+        </div>
+        <div style="margin-top:16px;font-size:10px;color:var(--text-dim)">Terminal v5.0 · Language-aware pricing · Universal search · Enhanced portfolio</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SUBSCRIPTION MODAL ─── -->
+<div id="sub-modal">
+  <div class="sub-modal-inner">
+    <div class="sub-modal-header">
+      <div style="font-size:24px;color:var(--gold-bright)">★</div>
+      <div class="sub-modal-title">GOLDSTAR TCG TERMINAL</div>
+      <div class="sub-modal-subtitle">Choose Your Trading Tier</div>
+      <span class="sub-close" onclick="hideSubscriptionModal()">✕</span>
+    </div>
+
+    <div class="sub-plans">
+      <!-- Free Tier -->
+      <div class="sub-plan">
+        <div class="sub-plan-name">SCOUT</div>
+        <div class="sub-plan-price">FREE</div>
+        <div class="sub-plan-desc">Get started with market basics</div>
+        <ul class="sub-features">
+          <li class="included">Dashboard overview</li>
+          <li class="included">Top 10 gainers/losers</li>
+          <li class="included">Basic charts (60D)</li>
+          <li class="included">5 watchlist slots</li>
+          <li class="locked">Arbitrage scanner</li>
+          <li class="locked">Grading calculator</li>
+          <li class="locked">Portfolio tracking</li>
+          <li class="locked">GoldStar Intel news</li>
+          <li class="locked">CSV export/import</li>
+        </ul>
+        <button class="sub-plan-btn free" onclick="selectSubPlan('free')">START FREE</button>
+      </div>
+
+      <!-- Pro Tier -->
+      <div class="sub-plan featured">
+        <div class="sub-plan-badge">MOST POPULAR</div>
+        <div class="sub-plan-name">PRO TRADER</div>
+        <div class="sub-plan-price">$29<span class="sub-plan-period">/mo</span></div>
+        <div class="sub-plan-desc">Full terminal access for serious traders</div>
+        <ul class="sub-features">
+          <li class="included">Everything in Scout</li>
+          <li class="included">Full arbitrage scanner</li>
+          <li class="included">Grading ROI calculator</li>
+          <li class="included">Unlimited portfolio tracking</li>
+          <li class="included">GoldStar Intel (exclusive)</li>
+          <li class="included">Unlimited watchlist + alerts</li>
+          <li class="included">All chart ranges + MA overlays</li>
+          <li class="included">CSV import/export</li>
+          <li class="included">Sealed product tracker</li>
+        </ul>
+        <button class="sub-plan-btn pro" onclick="selectSubPlan('pro')">GO PRO — $29/mo</button>
+      </div>
+
+      <!-- Whale Tier -->
+      <div class="sub-plan">
+        <div class="sub-plan-name">WHALE</div>
+        <div class="sub-plan-price">$99<span class="sub-plan-period">/mo</span></div>
+        <div class="sub-plan-desc">Enterprise-grade for high-volume dealers</div>
+        <ul class="sub-features">
+          <li class="included">Everything in Pro</li>
+          <li class="included">API access (TCGPlayer + eBay)</li>
+          <li class="included">Custom price alerts (SMS/email)</li>
+          <li class="included">Multi-portfolio management</li>
+          <li class="included">Tax lot tracking (FIFO/LIFO)</li>
+          <li class="included">Priority GoldStar Intel</li>
+          <li class="included">Show schedule + event intel</li>
+          <li class="included">Direct GoldStar consult (1hr/mo)</li>
+          <li class="included">White-label option</li>
+        </ul>
+        <button class="sub-plan-btn whale" onclick="selectSubPlan('whale')">GO WHALE — $99/mo</button>
+      </div>
+    </div>
+
+    <div class="sub-footer">
+      <div style="font-size:10px;color:var(--text-dim);text-align:center;line-height:1.8">
+        All plans include language-aware marketplace links to TCGPlayer & eBay · Cancel anytime<br>
+        <a href="https://www.ebay.com/usr/goldstaartcg" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">eBay: goldstaartcg</a> ·
+        <a href="https://www.instagram.com/goldstartcg.llc/" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">IG: @goldstartcg.llc</a> ·
+        <a href="https://app.getcollectr.com/showcase/profile/e59fe50f-3a80-4602-928b-6576c90b71fb" target="_blank" rel="noopener noreferrer" style="color:var(--gold)">Collectr</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── CARD DETAIL MODAL ─── -->
+<div id="card-modal">
+  <div class="card-modal-inner">
+    <div class="modal-header">
+      <div>
+        <div class="modal-sym">—</div>
+        <div class="modal-name">—</div>
+      </div>
+      <div class="modal-close" onclick="closeCardModal()">✕</div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-price-row">
+        <div class="modal-price">—</div>
+        <div class="modal-chg">—</div>
+      </div>
+      <div class="modal-stats-grid"></div>
+      <div class="modal-chart-wrap">
+        <canvas id="modal-chart-canvas"></canvas>
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn primary" onclick="addModalToWatchlist()">★ ADD TO WATCHLIST</button>
+        <button class="modal-btn" onclick="addModalToPortfolio()">+ ADD TO PORTFOLIO</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── SELL MODAL ─── -->
+<div id="sell-modal">
+  <div class="sell-modal-inner">
+    <div class="sell-modal-title">MARK AS SOLD — RECORD REALIZED GAIN</div>
+    <div class="sell-card-info" id="sell-card-name">—</div>
+    <div class="sell-input-group">
+      <label class="sell-label">SALE PRICE ($)</label>
+      <input class="sell-input" id="sell-price-input" type="number" step="0.01" placeholder="0.00" autofocus>
+    </div>
+    <div class="sell-profit-preview" id="sell-profit-preview">Enter sale price above to see P&L</div>
+    <div class="sell-actions">
+      <button class="btn-confirm-sell" onclick="confirmSell()">CONFIRM SALE</button>
+      <button class="btn-cancel-sell" onclick="closeSellModal()">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── NOTIFICATION ─── -->
+<div id="notification"></div>
+
+<!-- ─── QUICK CHART DASHBOARD ─── -->
+<script>
+let dashChart = null;
+function selectQuickChart(sym) {
+  const card = CARDS.find(c=>c.sym===sym);
+  if(!card) return;
+  const canvas = document.getElementById('dashboard-chart');
+  if(!canvas) return;
+  if(dashChart) { dashChart.destroy(); dashChart=null; }
+  const data = generatePriceHistory(card.price, 30, card.change30>0?0.002:-0.001);
+  const labels = Array.from({length:30},(_,i)=>{
+    const d=new Date(); d.setDate(d.getDate()-(30-i));
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  });
+  document.getElementById('featured-card-meta').textContent = `${card.sym} · ${card.game.toUpperCase()}`;
+  dashChart = new Chart(canvas.getContext('2d'), {
+    type:'line',
+    data:{ labels, datasets:[{
+      data, borderColor:'#D4AF37',
+      backgroundColor:'rgba(212,175,55,0.05)',
+      borderWidth:1.5, pointRadius:0, fill:true, tension:0.3
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false, animation:{duration:200},
+      plugins:{legend:{display:false},tooltip:{
+        backgroundColor:'#0e0e14',borderColor:'rgba(212,175,55,0.3)',borderWidth:1,
+        titleColor:'#D4AF37',bodyColor:'#e8e8e8',
+        titleFont:{family:'IBM Plex Mono',size:9},bodyFont:{family:'IBM Plex Mono',size:9},
+        callbacks:{label:ctx=>` ${fmt$(ctx.parsed.y)}`}
+      }},
+      scales:{
+        x:{ticks:{color:'#444',font:{family:'IBM Plex Mono',size:8},maxTicksLimit:6,maxRotation:0},
+           grid:{color:'rgba(255,255,255,0.03)'},border:{color:'transparent'}},
+        y:{ticks:{color:'#666',font:{family:'IBM Plex Mono',size:8},callback:v=>fmt$(v)},
+           grid:{color:'rgba(255,255,255,0.03)'},border:{color:'transparent'}}
+      }
+    }
+  });
+}
+window.addEventListener('load', () => {
+  setTimeout(() => selectQuickChart('MOONBREON'), 100);
+  function updatePortStatDisplay() {
+    const items = portfolioItems.filter(p=>!p.is_sold);
+    const cost = items.reduce((s,p)=>s+p.purchase_price*p.quantity,0);
+    const val  = items.reduce((s,p)=>s+(livePrices[p.sym]||p.current_price)*p.quantity,0);
+    const gain = val - cost;
+    const pct  = cost>0?(gain/cost*100):0;
+    const realized = portfolioItems.filter(p=>p.is_sold).reduce((s,p)=>s+((p.sold_price||0)-p.purchase_price)*p.quantity,0);
+    const setVal = (id, html) => { const e=document.getElementById(id); if(e) e.innerHTML=html; };
+    setVal('ps-value', `<span class="${colorClass(gain)}">${fmt$(val)}</span>`);
+    setVal('ps-cost',  `<span>${fmt$(cost)}</span>`);
+    setVal('ps-gain',  `<span class="${colorClass(gain)}">${fmtChg(gain)} (${fmtChg(pct,true)})</span>`);
+    setVal('ps-realized', `<span class="${colorClass(realized)}">${fmtChg(realized)}</span>`);
+    setVal('ps-count', `<span>${items.length}</span>`);
+  }
+  setInterval(updatePortStatDisplay, 5000);
+});
+</script>
+
+<script src="./app.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebarHeader = document.querySelector('.chart-sidebar-header');
+  if(sidebarHeader) sidebarHeader.textContent = `CARD UNIVERSE (${CARDS.length})`;
+});
+</script>
+
+<!-- ─── MOBILE BOTTOM NAV (visible only on small screens via CSS) ─── -->
+<nav id="mobile-nav">
+  <button class="mob-nav-btn active" data-view="dashboard" onclick="switchView('dashboard')">
+    <span class="mob-nav-icon">📊</span>
+    <span class="mob-nav-label">HOME</span>
+  </button>
+  <button class="mob-nav-btn" data-view="charts" onclick="switchView('charts')">
+    <span class="mob-nav-icon">📈</span>
+    <span class="mob-nav-label">CHARTS</span>
+  </button>
+  <button class="mob-nav-btn" data-view="portfolio" onclick="switchView('portfolio')">
+    <span class="mob-nav-icon">💼</span>
+    <span class="mob-nav-label">PORT</span>
+  </button>
+  <button class="mob-nav-btn" data-view="arb" onclick="switchView('arb')">
+    <span class="mob-nav-icon">⚡</span>
+    <span class="mob-nav-label">ARB</span>
+  </button>
+  <button class="mob-nav-btn mob-nav-more" onclick="toggleMobileMenu()">
+    <span class="mob-nav-icon">☰</span>
+    <span class="mob-nav-label">MORE</span>
+  </button>
+</nav>
+
+<!-- Mobile overflow menu (slides up from MORE button) -->
+<div id="mobile-menu" style="display:none">
+  <button onclick="switchView('sealed');toggleMobileMenu()">📦 SEALED</button>
+  <button onclick="switchView('grade');toggleMobileMenu()">⬡ GRADING</button>
+  <button onclick="switchView('watchlist');toggleMobileMenu()">👁 WATCHLIST</button>
+  <button onclick="showHelp();toggleMobileMenu()">📖 GUIDE</button>
+  <button onclick="openGlobalSearch();toggleMobileMenu()">🔍 SEARCH</button>
+  <button onclick="showSubscriptionModal();toggleMobileMenu()">★ PRO</button>
+</div>
+
+<!-- iOS install banner -->
+<div id="ios-install-banner" style="display:none">
+  <div class="ios-install-content">
+    <img src="./icons/icon-72x72.png" class="ios-install-icon" alt="GoldStar">
+    <div class="ios-install-text">
+      <strong>Install GoldStar TCG</strong>
+      <span>Tap <strong style="font-size:16px">⬆</strong> Share then "Add to Home Screen"</span>
+    </div>
+    <button class="ios-install-close" onclick="dismissInstallBanner()">✕</button>
+  </div>
+</div>
+
+<!-- Mobile interactions + Service Worker registration -->
+<script>
+// Mobile nav active state sync
+function updateMobileNav(view) {
+  document.querySelectorAll('.mob-nav-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.dataset.view === view);
+  });
+}
+
+// Hook into existing switchView to sync mobile nav
+(function() {
+  var origSwitchView = window.switchView;
+  if (origSwitchView) {
+    window.switchView = function(view) {
+      origSwitchView(view);
+      updateMobileNav(view);
+      // Close mobile menu when switching views
+      var menu = document.getElementById('mobile-menu');
+      if (menu) menu.style.display = 'none';
+    };
+  }
+})();
+
+// Toggle mobile overflow menu
+function toggleMobileMenu() {
+  var menu = document.getElementById('mobile-menu');
+  if (!menu) return;
+  menu.style.display = menu.style.display === 'none' ? 'grid' : 'none';
+}
+
+// iOS install banner (in-memory dismiss state)
+var _iosInstallDismissed = false;
+function checkIOSInstallBanner() {
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  var isStandalone = window.navigator.standalone === true;
+  if (isIOS && !isStandalone && !_iosInstallDismissed) {
+    var banner = document.getElementById('ios-install-banner');
+    if (banner) banner.style.display = 'flex';
+  }
+}
+
+function dismissInstallBanner() {
+  _iosInstallDismissed = true;
+  var banner = document.getElementById('ios-install-banner');
+  if (banner) banner.style.display = 'none';
+}
+
+// Check on load
+window.addEventListener('load', checkIOSInstallBanner);
+
+// Close mobile menu on outside click
+document.addEventListener('click', function(e) {
+  var menu = document.getElementById('mobile-menu');
+  var moreBtn = document.querySelector('.mob-nav-more');
+  if (menu && menu.style.display !== 'none' && moreBtn &&
+      !menu.contains(e.target) && !moreBtn.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+// Register Service Worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('./sw.js')
+      .then(function(reg) { console.log('SW registered:', reg.scope); })
+      .catch(function(err) { console.log('SW error:', err); });
+  });
+}
+</script>
+
+</body>
+</html>
